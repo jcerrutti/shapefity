@@ -12,13 +12,10 @@ export default class Board extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      circles: [],
       points: [],
       shapeDrawed: false,
     };
-  }
-
-  componentDidMount() {
-    console.log(this.parallelogramRef);
   }
 
   onClickHandler = ({ evt }) => {
@@ -27,12 +24,13 @@ export default class Board extends Component {
     const { clientX, clientY } = evt;
 
     this.setState(prevState => {
-      return this.updatePoints(prevState.points, clientX, clientY);
+      return this.addPoints(prevState.points, prevState.circles, clientX, clientY);
     });
   };
 
-  updatePoints(prevPoints, pointX, pointY) {
+  addPoints(prevPoints, circles, pointX, pointY) {
     let newPoints = [...prevPoints, pointX, pointY];
+    const newCircles = [...circles, { x: pointX, y: pointY }];
     let circleCenter = [];
     let circleRadius = 0;
     if (newPoints.length > 5) {
@@ -49,23 +47,64 @@ export default class Board extends Component {
       circleRadius = getCircleRadius([newPoints[0], newPoints[1]], [newPoints[2], newPoints[3]]);
     }
     return {
+      circles: newCircles,
       points: newPoints,
       shapeDrawed: newPoints.length === 8,
       circlePoints: circleCenter,
       circleRadius,
     };
   }
+
+  circleMoved = ({ evt }, index) => {
+    const { clientX, clientY } = evt;
+
+    this.updatePoints({ x: clientX, y: clientY }, index);
+  };
+
+  updatePoints = ({ x, y }, index) => {
+    this.setState(prevState => {
+      const newPoints = [...prevState.points];
+
+      // Select the starting index, knowing that the points are based on couples (2)
+      const startIndex = index * 2;
+      newPoints[startIndex] = x;
+      newPoints[startIndex + 1] = y;
+
+      const fourthCoord = getParallelogramFourthVertex(
+        [newPoints[0], newPoints[1]],
+        [newPoints[2], newPoints[3]],
+        [newPoints[4], newPoints[5]]
+      );
+
+      debugger
+      newPoints[newPoints.length - 2] = [fourthCoord[0]];
+      newPoints[newPoints.length - 1] = [fourthCoord[1]];
+
+      return {
+        points: newPoints,
+      };
+    });
+  };
+
   render() {
-    const { points, shapeDrawed, circlePoints, circleRadius } = this.state;
+    const { points, circles, shapeDrawed, circlePoints, circleRadius } = this.state;
     return (
       <div>
         <Stage width={window.innerWidth} height={window.innerHeight} onClick={this.onClickHandler}>
           <Layer>
             <Group>
-              <Parallelogram
-                points={points}
-              ></Parallelogram>
-              {shapeDrawed && (
+              <Parallelogram points={points}></Parallelogram>
+              {circles.map(({ x, y }, index) => (
+                <Circle
+                  x={x}
+                  y={y}
+                  radius={6}
+                  fill={'red'}
+                  draggable
+                  onDragMove={e => this.circleMoved(e, index)}
+                ></Circle>
+              ))}
+              {false && (
                 <Circle
                   x={circlePoints[0]}
                   y={circlePoints[1]}
