@@ -3,9 +3,9 @@ import React, { Component } from 'react';
 import { Stage, Layer, Group, Circle } from 'react-konva';
 
 import './Board.css';
-import Parallelogram from '../CustomShapes/Parallelogram';
+import Parallelogram from '../customShapes/Parallelogram';
 import { getParallelogramInformation, getCircleInformation } from '../../services/shape';
-import TextInformation from '../CustomShapes/TextInformation';
+import TextInformation from '../customShapes/TextInformation';
 
 export default class Board extends Component {
   constructor(props) {

@@ -1,7 +1,7 @@
 import React from 'react';
 import './App.css';
-import Board from './components/Board/Board';
-import About from './components/About/About';
+import Board from './components/board/Board';
+import About from './components/bbout/About';
 
 function App() {
   return (
