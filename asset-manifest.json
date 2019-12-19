@@ -1,0 +1,22 @@
+{
+  "files": {
+    "main.css": "/shapefity/static/css/main.edda920f.chunk.css",
+    "main.js": "/shapefity/static/js/main.df5d4821.chunk.js",
+    "main.js.map": "/shapefity/static/js/main.df5d4821.chunk.js.map",
+    "runtime-main.js": "/shapefity/static/js/runtime-main.22a0d86e.js",
+    "runtime-main.js.map": "/shapefity/static/js/runtime-main.22a0d86e.js.map",
+    "static/js/2.320b7db8.chunk.js": "/shapefity/static/js/2.320b7db8.chunk.js",
+    "static/js/2.320b7db8.chunk.js.map": "/shapefity/static/js/2.320b7db8.chunk.js.map",
+    "index.html": "/shapefity/index.html",
+    "precache-manifest.b40152852ff90dff439518ec14b39848.js": "/shapefity/precache-manifest.b40152852ff90dff439518ec14b39848.js",
+    "service-worker.js": "/shapefity/service-worker.js",
+    "static/css/main.edda920f.chunk.css.map": "/shapefity/static/css/main.edda920f.chunk.css.map",
+    "static/js/2.320b7db8.chunk.js.LICENSE": "/shapefity/static/js/2.320b7db8.chunk.js.LICENSE"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.22a0d86e.js",
+    "static/js/2.320b7db8.chunk.js",
+    "static/css/main.edda920f.chunk.css",
+    "static/js/main.df5d4821.chunk.js"
+  ]
+}
