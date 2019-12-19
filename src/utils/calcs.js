@@ -12,9 +12,14 @@ export function getParallelogramCenter([x1, y1], [x3, y3]) {
   return [x, y];
 }
 
-export function getCircleRadius([x1, y1], [x2, y2]) {
-  const angleDeg = (Math.atan2(y2 - y1, x2 - x1) * 180) / Math.PI;
-  const deltaX = Math.abs(x2 - x1);
-  const deltaY = Math.abs(y2 - y1);
-  return Math.abs(deltaX * deltaY * Math.sin(angleDeg));
+export function getCircleRadius([x1, y1], [x2, y2], [x3, y3]) {
+  var AB = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+  var BC = Math.sqrt(Math.pow(x2 - x3, 2) + Math.pow(y2 - y3, 2));
+  var AC = Math.sqrt(Math.pow(x3 - x1, 2) + Math.pow(y3 - y1, 2));
+  const angleDegRad = Math.acos((BC * BC + AB * AB - AC * AC) / (2 * BC * AB));
+
+  const circleArea = Math.abs(AB * BC * Math.sin(angleDegRad));
+  const circleRadius = Math.sqrt(circleArea / Math.PI);
+
+  return circleRadius;
 }

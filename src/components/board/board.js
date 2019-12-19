@@ -1,12 +1,10 @@
 import React, { Component } from 'react';
 
 import { Stage, Layer, Group, Circle } from 'react-konva';
+
+import './board.css';
 import Parallelogram from '../shapes/parallelogram';
-import {
-  getParallelogramFourthVertex,
-  getParallelogramCenter,
-  getCircleRadius,
-} from '../../utils/calcs';
+import { getParallelogramInformation, getCircleInformation } from '../../services/shape';
 
 export default class Board extends Component {
   constructor(props) {
@@ -14,51 +12,49 @@ export default class Board extends Component {
     this.state = {
       circles: [],
       points: [],
-      shapeDrawed: false,
+      parallelogramDrawed: false,
+      circleRadius: null,
+      circleCoordinates: [],
     };
   }
 
   onClickHandler = ({ evt }) => {
-    if (this.state.shapeDrawed) return;
+    if (this.state.parallelogramDrawed) return;
 
-    const { clientX, clientY } = evt;
+    const { layerX, layerY } = evt;
 
     this.setState(prevState => {
-      return this.addPoints(prevState.points, prevState.circles, clientX, clientY);
+      return this.addPoints(prevState.points, prevState.circles, layerX, layerY);
     });
   };
 
   addPoints(prevPoints, circles, pointX, pointY) {
     let newPoints = [...prevPoints, pointX, pointY];
-    const newCircles = [...circles, { x: pointX, y: pointY }];
-    let circleCenter = [];
     let circleRadius = 0;
+    let circleCoordinates = [];
     if (newPoints.length > 5) {
-      const fourthCoord = getParallelogramFourthVertex(
-        [newPoints[0], newPoints[1]],
-        [newPoints[2], newPoints[3]],
-        [newPoints[4], newPoints[5]]
-      );
-      newPoints = [...newPoints, ...fourthCoord];
-      circleCenter = getParallelogramCenter(
-        [newPoints[0], newPoints[1]],
-        [newPoints[4], newPoints[5]]
-      );
-      circleRadius = getCircleRadius([newPoints[0], newPoints[1]], [newPoints[2], newPoints[3]]);
+      const {
+        parallelogramFourthCoordinate: fourthCoordinate,
+        parallelogramCenter,
+      } = getParallelogramInformation(newPoints);
+      circleCoordinates = parallelogramCenter;
+      newPoints = [...newPoints, ...fourthCoordinate];
+
+      circleRadius = getCircleInformation(newPoints);
     }
     return {
-      circles: newCircles,
+      circles: [...circles, { x: pointX, y: pointY }],
       points: newPoints,
-      shapeDrawed: newPoints.length === 8,
-      circlePoints: circleCenter,
+      parallelogramDrawed: newPoints.length === 8,
+      circleCoordinates,
       circleRadius,
     };
   }
 
-  circleMoved = ({ evt }, index) => {
-    const { clientX, clientY } = evt;
+  onDragPointHandler = ({ evt }, index) => {
+    const { layerX, layerY } = evt;
 
-    this.updatePoints({ x: clientX, y: clientY }, index);
+    this.updatePoints({ x: layerX, y: layerY }, index);
   };
 
   updatePoints = ({ x, y }, index) => {
@@ -70,48 +66,51 @@ export default class Board extends Component {
       newPoints[startIndex] = x;
       newPoints[startIndex + 1] = y;
 
-      const fourthCoord = getParallelogramFourthVertex(
-        [newPoints[0], newPoints[1]],
-        [newPoints[2], newPoints[3]],
-        [newPoints[4], newPoints[5]]
-      );
+      const {
+        parallelogramFourthCoordinate: fourthCoordinate,
+        parallelogramCenter,
+      } = getParallelogramInformation(newPoints);
 
-      debugger
-      newPoints[newPoints.length - 2] = [fourthCoord[0]];
-      newPoints[newPoints.length - 1] = [fourthCoord[1]];
+      newPoints[newPoints.length - 2] = fourthCoordinate[0];
+      newPoints[newPoints.length - 1] = fourthCoordinate[1];
+
+      const circleRadius = getCircleInformation(newPoints);
 
       return {
         points: newPoints,
+        circleCoordinates: parallelogramCenter,
+        circleRadius,
       };
     });
   };
 
   render() {
-    const { points, circles, shapeDrawed, circlePoints, circleRadius } = this.state;
+    const { points, circles, parallelogramDrawed, circleCoordinates, circleRadius } = this.state;
     return (
       <div>
-        <Stage width={window.innerWidth} height={window.innerHeight} onClick={this.onClickHandler}>
+        <Stage className="stage" width={700} height={600} onClick={this.onClickHandler}>
           <Layer>
             <Group>
+              {parallelogramDrawed && (
+                <Circle
+                  x={circleCoordinates[0]}
+                  y={circleCoordinates[1]}
+                  radius={circleRadius}
+                  stroke={'yellow'}
+                ></Circle>
+              )}
               <Parallelogram points={points}></Parallelogram>
               {circles.map(({ x, y }, index) => (
                 <Circle
+                  key={index}
                   x={x}
                   y={y}
                   radius={6}
                   fill={'red'}
                   draggable
-                  onDragMove={e => this.circleMoved(e, index)}
+                  onDragMove={e => this.onDragPointHandler(e, index)}
                 ></Circle>
               ))}
-              {false && (
-                <Circle
-                  x={circlePoints[0]}
-                  y={circlePoints[1]}
-                  radius={circleRadius}
-                  fill={'green'}
-                ></Circle>
-              )}
             </Group>
           </Layer>
         </Stage>
