@@ -2,10 +2,10 @@ import React, { Component } from 'react';
 
 import { Stage, Layer, Group, Circle } from 'react-konva';
 
-import './board.css';
-import Parallelogram from '../customShapes/Parallelogram';
+import './Board.css';
+import Parallelogram from '../CustomShapes/Parallelogram';
 import { getParallelogramInformation, getCircleInformation } from '../../services/shape';
-import TextInformation from '../customShapes/TextInformation';
+import TextInformation from '../CustomShapes/TextInformation';
 
 export default class Board extends Component {
   constructor(props) {
