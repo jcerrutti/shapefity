@@ -3,22 +3,32 @@ import React, { Component } from 'react';
 import { Stage, Layer, Group, Circle } from 'react-konva';
 
 import './board.css';
-import Parallelogram from '../shapes/parallelogram';
+import Parallelogram from '../customShapes/Parallelogram';
 import { getParallelogramInformation, getCircleInformation } from '../../services/shape';
+import TextInformation from '../customShapes/TextInformation';
 
 export default class Board extends Component {
   constructor(props) {
     super(props);
-    this.state = {
+    this.state = this.getDefaultState();
+  }
+
+  onResetClickHandler = () => {
+    this.setState(this.getDefaultState());
+  };
+
+  getDefaultState = () => {
+    return {
       circles: [],
       points: [],
       parallelogramDrawed: false,
       circleRadius: null,
       circleCoordinates: [],
+      textInformation: [],
     };
-  }
+  };
 
-  onClickHandler = ({ evt }) => {
+  onStateClickHandler = ({ evt }) => {
     if (this.state.parallelogramDrawed) return;
 
     const { layerX, layerY } = evt;
@@ -32,6 +42,7 @@ export default class Board extends Component {
     let newPoints = [...prevPoints, pointX, pointY];
     let circleRadius = 0;
     let circleCoordinates = [];
+    let textInformation = [];
     if (newPoints.length > 5) {
       const {
         parallelogramFourthCoordinate: fourthCoordinate,
@@ -41,6 +52,13 @@ export default class Board extends Component {
       newPoints = [...newPoints, ...fourthCoordinate];
 
       circleRadius = getCircleInformation(newPoints);
+
+      textInformation = [
+        {
+          key: 'Shapes Radius',
+          value: circleRadius,
+        },
+      ];
     }
     return {
       circles: [...circles, { x: pointX, y: pointY }],
@@ -48,6 +66,7 @@ export default class Board extends Component {
       parallelogramDrawed: newPoints.length === 8,
       circleCoordinates,
       circleRadius,
+      textInformation,
     };
   }
 
@@ -76,19 +95,37 @@ export default class Board extends Component {
 
       const circleRadius = getCircleInformation(newPoints);
 
+      const textInformation = [
+        {
+          key: 'Shapes Radius',
+          value: circleRadius,
+        },
+      ];
+
       return {
         points: newPoints,
         circleCoordinates: parallelogramCenter,
         circleRadius,
+        textInformation,
       };
     });
   };
 
   render() {
-    const { points, circles, parallelogramDrawed, circleCoordinates, circleRadius } = this.state;
+    const {
+      points,
+      circles,
+      parallelogramDrawed,
+      circleCoordinates,
+      circleRadius,
+      textInformation,
+    } = this.state;
     return (
       <div>
-        <Stage className="stage" width={700} height={600} onClick={this.onClickHandler}>
+        <button onClick={this.onResetClickHandler} className="button button-reset">
+          Reset Board
+        </button>
+        <Stage className="stage" width={700} height={600} onClick={this.onStateClickHandler}>
           <Layer>
             <Group>
               {parallelogramDrawed && (
@@ -99,6 +136,7 @@ export default class Board extends Component {
                   stroke={'yellow'}
                 ></Circle>
               )}
+              <TextInformation textInformation={textInformation}></TextInformation>
               <Parallelogram points={points}></Parallelogram>
               {circles.map(({ x, y }, index) => (
                 <Circle

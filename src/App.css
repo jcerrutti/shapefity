@@ -3,3 +3,8 @@
 
   padding: 1rem;
 }
+
+.board-section {
+  display: flex;
+  justify-content: space-around;
+}
